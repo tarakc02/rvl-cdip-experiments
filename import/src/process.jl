@@ -12,23 +12,27 @@ listing = TarIterator(cmplist, :file, close_stream=false)
 seekstart(listing)
 
 function save_thumbnail(stream, outpath)
+    contains(outpath, r"\.tif$") || return true
     img = load(IOBuffer(read(stream)))
     small = imresize(img, (250, 192))
     save(outpath, small)
     true
 end
 
-function resize_dir(tarlist; max=100)
-    counter = 0;
+function resize_dir(tarlist)
     seekstart(tarlist)
     for (hdr, stream) in tarlist
-        counter >= max && break
         outpath = joinpath("output", hdr.path)
-        isfile(outpath) || save_thumbnail(stream, outpath)
-        counter += 1
+        isfile(outpath) && return true
+        try
+            save_thumbnail(stream, outpath)
+        catch e
+            continue
+        end
     end
     true
 end
 
-@time resize_dir(listing, max=1000)
+resize_dir(listing)
 
+# done.
