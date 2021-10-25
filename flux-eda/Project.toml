@@ -1,0 +1,6 @@
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+DataLoaders = "2e981812-ef13-4a9c-bfa0-ab13047b12a9"
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+Images = "916415d5-f1e6-5110-898d-aaa5f9f070e0"
+LearnBase = "7f8f8fb0-2700-5f03-b4bd-41f8cfc144b6"
