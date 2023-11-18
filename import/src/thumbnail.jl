@@ -9,11 +9,10 @@ tar_fn = "input/rvl-cdip.tar.gz"
 cmplist = GzipDecompressorStream(open(tar_fn))
 listing = TarIterator(cmplist, :file, close_stream=false)
 
-seekstart(listing)
-
 function save_thumbnail(stream, outpath)
     contains(outpath, r"\.tif$") || return true
     img = load(IOBuffer(read(stream)))
+    img === nothing && return true
     small = imresize(img, (250, 192))
     save(outpath, small)
     true
@@ -23,12 +22,7 @@ function resize_dir(tarlist)
     seekstart(tarlist)
     for (hdr, stream) in tarlist
         outpath = joinpath("output", hdr.path)
-        isfile(outpath) && return true
-        try
-            save_thumbnail(stream, outpath)
-        catch e
-            continue
-        end
+        isfile(outpath) || save_thumbnail(stream, outpath)
     end
     true
 end

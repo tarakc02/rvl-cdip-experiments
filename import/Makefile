@@ -1,14 +1,30 @@
-input :=  input/rvl-cdip.tar.gz
-thumbnails := output/thumbnails.done
-src := src/
+# vim: set ts=8 sts=0 sw=8 si fenc=utf-8 noet:
+# vim: set fdm=marker fmr={{{,}}} fdl=0 foldcolumn=4:
 
-.PHONY: all
+imgs   :=  input/rvl-cdip.tar.gz
+thumbs := output/thumbnails.done
 
-all: $(thumbnails)
+labs_in  := input/labels_only.tar.gz
+labs_out := output/labels.parquet
 
-$(thumbnails): src/process.jl $(input)
+.PHONY: all clean
+
+all: $(thumbs) $(labs_out)
+
+clean: 
+	-rm -r output/*
+
+
+$(thumbs): src/thumbnail.jl $(imgs)
 	-mkdir output
-	julia --project=. -e "using Pkg; Pkg.instantiate();"
-	JULIA_NUM_THREADS=4 julia --project=. $<
+	julia --project --threads=auto -e "using Pkg; Pkg.instantiate();"
+	julia --project --threads=auto $<
+	touch $@
 
+$(labs_out): src/import-labels.R $(labs_in) $(thumbs)
+	-mkdir output
+	Rscript --vanilla $< \
+		--input=$(labs_in) \
+		--outdir=output
+	
 # done.
