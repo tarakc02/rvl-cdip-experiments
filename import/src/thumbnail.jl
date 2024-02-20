@@ -5,7 +5,7 @@ using CodecZlib, TarIterators
 using FileIO: load, save
 using ImageTransformations: imresize
 
-tar_fn = "input/rvl-cdip.tar.gz"
+tar_fn = ARGS[1]
 cmplist = GzipDecompressorStream(open(tar_fn))
 listing = TarIterator(cmplist, :file, close_stream=false)
 

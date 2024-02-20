@@ -18,7 +18,7 @@ clean:
 $(thumbs): src/thumbnail.jl $(imgs)
 	-mkdir output
 	julia --project --threads=auto -e "using Pkg; Pkg.instantiate();"
-	julia --project --threads=auto $<
+	julia --project --threads=auto $< $(imgs)
 	touch $@
 
 $(labs_out): src/import-labels.R $(labs_in) $(thumbs)
