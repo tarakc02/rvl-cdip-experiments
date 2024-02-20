@@ -33,19 +33,29 @@ def get_dataloaders(data):
     return ImageDataLoaders.from_df(data,
             path="../import",
             fn_col = 'filename',
-            label_col = 'label'
+            label_col = 'label',
+            bs=256
             )
 
 
+def get_device():
+    if torch.cuda.is_available():
+        return torch.device("cuda")
+    elif torch.backends.mps.is_available():
+        return torch.device("mps")
+    else:
+        return torch.device("cpu")
+
+
 def setup_model(dls):
-    mps = torch.device("mps")
+    dev = get_device()
     learn = vision_learner(dls,
-            resnet18,
+            resnet50,
             metrics=error_rate,
             path = "output",
             model_dir = ".")
-    learn.to(mps)
-    learn.dls.to(mps)
+    learn.to(dev)
+    learn.dls.to(dev)
     return learn
 
 
@@ -75,7 +85,7 @@ logger.info(f"using tuning_n: {tuning_n}")
 logger.info(f"using learning rate: {lr.valley}")
 logger.info("training the model")
 
-learn.fine_tune(10, lr.valley)
+learn.fine_tune(3, lr.valley)
 
 logger.info("model training done")
 logger.info(f"after training, validation error rate is {learn.validate()[1]}")
